@@ -162,4 +162,5 @@ typedef struct
 } EXPORT_DIRECTORY, *P_EXPORT_DIRECTORY;
 
 #endif /* _WIN32 */
+
 #endif /* SINGLEP_H */

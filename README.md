@@ -1,10 +1,9 @@
 Singlep plugin
 ======
 
-This plugin incorporates code provided by Pierre-Marie Baty
-(http://racc.bots-united.com/) for using Metamod with single-player Half-Life, which
-came from discussions with Botman (http://hpb-bot.bots-united.com/) on running
-bots in single-player Half-Life.
+This plugin incorporates code provided by [Pierre-Marie Baty](http://www.pmbaty.com/)
+for using Metamod with single-player Half-Life, which came from discussions with
+[botman](http://hpb-bot.bots-united.com/) on running bots in single-player Half-Life.
 
 
 Use of singlep

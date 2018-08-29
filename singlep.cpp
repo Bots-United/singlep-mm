@@ -1,7 +1,9 @@
-// vi: set ts=4 sw=4 :
-// vim: set tw=75 :
-
 // singlep.cpp - singleplayer support
+
+// Modified version by Wei Mingzhi <whistler_wmz at users.sf.net>
+// 8/29/2018:
+// - Add support for GNU/Linux and macOS
+// - Simplified code
 
 /*
  * Copyright (c) 2002-2003 Pierre-Marie Baty <pm@racc-ai.com>
@@ -35,24 +37,22 @@
  *
  */
 
-#include <stdio.h>			// fopen, etc
-#include <string.h>			// strstr
+#include <stdio.h>
+#include <string.h>
 
-#include <extdll.h>			// always
+#include <extdll.h>
+#include <meta_api.h>
+#include <mutil.h>
+#include <support_meta.h>
+#include <osdep.h>
 
-#include <meta_api.h>		// gpMetaUtilFuncs
-#include <mutil.h>			// GET_GAME_INFO
-#include <support_meta.h>	// STRNCPY
-#include <osdep.h>			// DLOPEN, DLSYM
-
-#include "singlep.h"		// me
+#include "singlep.h"
 
 //! Holds engine functionality callbacks
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 
 // Description of plugin.
-// (V* info from info_name.h)
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"SinglePlayer",		// name
@@ -173,16 +173,16 @@ void sp_load_gamedll_symbols(void) {
 }
 
 uint32 sp_FunctionFromName(const char *pName) {
-	return (uint32)DLSYM(gamedll_handle, pName);
+	RETURN_META_VALUE(MRES_SUPERCEDE, (uint32)dlsym(gamedll_handle, pName));
 }
 
 const char *sp_NameForFunction(uint32 function) {
 	Dl_info info = {0};
 	dladdr((void *)function, &info);
 	if (info.dli_sname) {
-		return info.dli_sname;
+		RETURN_META_VALUE(MRES_SUPERCEDE, info.dli_sname);
 	}
-	return NULL;
+	RETURN_META_VALUE(MRES_SUPERCEDE, 0);;
 }
 
 void sp_unload_gamedll_symbols(void) {
@@ -408,7 +408,7 @@ void sp_unload_gamedll_symbols(void) {
 #endif
 
 C_DLLEXPORT int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine, 
-		int *interfaceVersion) 
+		int *interfaceVersion)
 {
 	pengfuncsFromEngine->pfnFunctionFromName = sp_FunctionFromName;
 	pengfuncsFromEngine->pfnNameForFunction = sp_NameForFunction;
@@ -419,7 +419,8 @@ C_DLLEXPORT int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine,
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
 // do some setup operations here.
-void WINAPI GiveFnptrsToDll(enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals) {
+C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals)
+{
 	memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
 	gpGlobals = pGlobals;
 }
