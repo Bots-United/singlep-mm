@@ -1,0 +1,29 @@
+# Makefile for MinGW
+
+CXX=i686-w64-mingw32-g++
+DLLWRAP=i686-w64-mingw32-dllwrap
+
+OBJ=singlep.o
+
+CCOPT = -O2 -DNDEBUG -s
+CCDEBUG = -g -D_DEBUG
+CCARCH =
+
+SDKTOP = ../hlsdk
+METAMODDIR = ../metamod-hl1/metamod
+
+CFLAGS = $(CCOPT) -w -I$(METAMODDIR) -I$(SDKTOP)/common -I$(SDKTOP)/engine -I$(SDKTOP)/pm_shared -I$(SDKTOP)/dlls -I$(SDKTOP)/public
+#CFLAGS = $(CCDEBUG) -w -I$(METAMODDIR) -I$(SDKTOP)/common -I$(SDKTOP)/engine -I$(SDKTOP)/pm_shared -I$(SDKTOP)/dlls -I$(SDKTOP)/public
+
+BASEFLAGS=-Dstricmp=strcasecmp -Dstrcmpi=strcasecmp
+CPPFLAGS=${BASEFLAGS} ${CFLAGS}
+
+singlep_mm_i386.dll:	${OBJ}
+	${DLLWRAP} ${CPPFLAGS} --dllname singlep_mm_i386.dll --add-stdcall-alias ${OBJ} --driver-name ${CXX} -lkernel32 -luser32
+
+clean:
+	-rm -f *.o
+	-rm -f *.dll
+
+%.o:	%.cpp
+	${CXX} ${CPPFLAGS} ${CCARCH} -c $< -o $@
